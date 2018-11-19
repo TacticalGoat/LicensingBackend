@@ -10,12 +10,16 @@ import json
 def check_status():
     data = {
         "user_email": request.args.get("email", None),
-        "product_id": request.args.get("product", None)
+        "product_id": request.args.get("product", None),
+        "account_number": request.args.get("account_number", None)
     }
-    required_params = ["user_email", "product_id"]
+    required_params = ["user_email", "product_id", "account_number"]
     try:
         assert all(data[key] is not None for key in data)
-        license = License.query.filter(**data).first()
+        license = License.query.filter_by(user_email=data["user_email"],
+                                          product_id=data["product_id"],
+                                          account_number=data["account_number"]
+                  ).first()
         if license is None:
             return jsonify({
                 "msg": "User or license don't exist"
@@ -79,6 +83,7 @@ def create_license():
         )
         db.session.add(new_license)
         db.session.commit()
+        return jsonify(new_license.to_dict()), 201
     except AssertionError:
         return jsonify({
             "msg": "{0} are required params".format(required_params)

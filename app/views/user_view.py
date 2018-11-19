@@ -19,6 +19,7 @@ def create_user():
         new_user = User(**data)
         db.session.add(new_user)
         db.session.commit()
+        return jsonify(new_user.to_dict()), 200
     except AssertionError:
         return jsonify(
             {
